@@ -22,13 +22,13 @@
 
 如先前所述，我们假设有两个环境，sit和prd环境，这两个环境是主线环境，我们需要针对这两个环境进行基于特性的版本控制。
 
-![image-20200908003355308](F:\git研发\multienv-multiver-gittool\theory\picture\image-20200908003118079.png)
+![image-20200908003355308](.\picture\image-20200908003118079.png)
 
 我们假设当前的环境如<u>*上*</u>*<u>图</u>*所示，**ft01**代表了我们开发的东西属于**特性01**，后面的是表明这个合并到主分支上面的commit信息。~~原谅我很没有创意的用古诗词作为讲解道具，因为这东西没有什么阅读障碍。~~
 
 目前的状态开发如下图，登鹳雀楼完成了，江雪完成了第一段。
 
-![image-20200908003948035](F:\git研发\multienv-multiver-gittool\theory\picture\image-20200908003751286.png)
+![image-20200908003948035](.\picture\image-20200908003751286.png)
 
 ### 特性如何开发，从DEV到SIT
 
@@ -52,13 +52,13 @@ git push
 
 你的作品完成了第一句话` 月黑雁飞高，单于夜遁逃。` 下图是你在**你的分支**上commit完成的结果
 
-![image-20200908005238906](F:\git研发\multienv-multiver-gittool\theory\picture\image-20200908005238906.png)
+![image-20200908005238906](.\picture\image-20200908005238906.png)
 
-![image-20200908004918637](F:\git研发\multienv-multiver-gittool\theory\picture\image-20200908004918637.png)
+![image-20200908004918637](.\picture\image-20200908004918637.png)
 
 这个时候你准备将你的成果添加到sit环境中，不过还记得江雪吗？它完成了，并且先你一步提交，不过不要紧，你们在不同的文件上，并不会产生版本冲突。这个时候的环境开启来是这样的
 
-![image-20200908005542841](F:\git研发\multienv-multiver-gittool\theory\picture\image-20200908005542841.png)
+![image-20200908005542841](.\picture\image-20200908005542841.png)
 
 #### 如何合并回主线，这是重头戏！！！
 
@@ -72,7 +72,7 @@ git merge sit
 
 完成后情况如下图
 
-![image-20200908010256999](F:\git研发\multienv-multiver-gittool\theory\picture\image-20200908010256999.png)
+![image-20200908010256999](.\picture\image-20200908010256999.png)
 
 
 
@@ -85,13 +85,13 @@ git merge --no-ff ft03
 
 记住，使用merge的no-ff 模式，区别可以看下图
 
-![image-20200908010657620](F:\git研发\multienv-multiver-gittool\theory\picture\image-20200908010657620.png)
+![image-20200908010657620](.\picture\image-20200908010657620.png)
 
 同时注意，commit的名字也要符合之前说的要求**ftxx-commit的内容**
 
 如果只关注sit的主干部分，完全忽视ft03分支，效果其实如下图
 
-![image-20200908011126181](F:\git研发\multienv-multiver-gittool\theory\picture\image-20200908011126181.png)
+![image-20200908011126181](.\picture\image-20200908011126181.png)
 
 #### 后日谈
 
@@ -99,7 +99,7 @@ git merge --no-ff ft03
 
 当然，一个future并不是合并完就死掉了，它还可以继续进行接下来的开发，然后将主干融入再融合进入主干，比如这样。
 
-![image-20200908012124234](F:\git研发\multienv-multiver-gittool\theory\picture\image-20200908012124234.png)
+![image-20200908012124234](.\picture\image-20200908012124234.png)
 
 这种多段多次的merge是我们的交流基础和共识，如果你认同了这个观点，下面的故事才可能发生，不然就会有无穷尽的争论了，接下来的所有commit，我们都认为可能是大量的复杂文件提交以及一个最终版本处理之后才提交的。
 
