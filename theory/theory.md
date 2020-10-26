@@ -129,6 +129,12 @@ git commit -m 'ft~~-你提交的内容'
 
 
 
+git diff-tree --no-commit-id --name-only -r <commit-ish>
+
+```
+git log --pretty=oneline 文件名
+```
+
 
 
 ## 发生冲突的情况
