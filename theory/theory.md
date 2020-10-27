@@ -107,11 +107,20 @@ git commit -m 'ft~~-你提交的内容'
 
 如果要持续集成，尽量避免使用分支。然而因为这种畸形的使用merge，可以做到尽早合并，尽快合并。意见每天下班前，如果自己的dev环境可靠，就进行一次合并到主干的操作，保证提后不要出现太多的版本关联问题。
 
-当然，一个future并不是合并完就死掉了（和rebase有明显区别），它还可以继续进行接下来的开发，然后将主干融入再融合进入主干，比如这样。而且我们建议，在下图中合并的时候，一个空的commit ` git commit --allow-empty -m "合并到主干分支"`
+当然在这种使用模型下面，一个future并不是合并完就死掉了（和rebase有明显区别），它还可以继续进行接下来的开发，然后将主干融入再融合进入主干，比如这样。而且我们建议，在下图中合并的时候，生成一个空的commit，标志自己进入主干分支 ` git commit --allow-empty -m "合并到主干分支"`
 
 ![image-20201027004643344](F:\git研发\multienv-multiver-gittool\theory\picture\image-20201027004643344.png)
 
-这种多段多次的merge是我们的交流基础和共识，如果你认同了这个观点，下面的故事才可能发生，不然就会是无穷地争论方便性和管理了，接下来的所有commit，我们都认为可能是有着大量的复杂文件提交且合并了一个最终版本才提交的。
+不过这种merge squash开发有着一个问题：你的修改是无源头的，这个对于git来说一个很不爽的事情——你的一切修改，使用了squash合并之后，原则上讲都和之前的commit行为脱钩了。最简单的讲，git认为sit上的提交和ft03上的提交不是同一个东西，如果日后修改了这个文件git会认为是个冲突而不是来源你的修改，所以还要讲自己的提交merge回自己在的特性分支上。
+
+```shell
+git checkout ft03
+git merge sit
+```
+
+![image-20201028010643647](F:\git研发\multienv-multiver-gittool\theory\picture\image-20201028010643647.png)
+
+这种多段多次的各种方式的merge是我们的交流基础和共识，如果你认同了这个观点，下面的故事才可能发生，不然就会是无穷地争论方便性和管理了，接下来的所有commit，我们都认为可能是有着大量的复杂文件提交且合并了一个最终版本才提交的。
 
 这个git模型连作者本人都觉得麻烦，但是它也适合的是极度麻烦的环境——拥有多个环境，每个环境还有各自的版本，每个环境间需要的特性甚至前后顺序都是颠倒错位的，甚至有的特性上了某个环境运行一阵之后又要撤下来。
 
@@ -125,19 +134,67 @@ git commit -m 'ft~~-你提交的内容'
 
 不过，在cherry-pick前，我们还做一件事——确定这次cherrypick带来的版本关联。也就是如果想要将某个commit亦或是某个feature下的全部commit移动到另一个环境，需要去进行这一系列commit中的文件和其他commit之间的版本关联问题，如果不幸产生了版本关联，那么只能进行人工处理了。
 
-现在我们假设ft02需要登录prd环境，
+目前的状况如下图所示
+
+![image-20201028011517608](F:\git研发\multienv-multiver-gittool\theory\picture\image-20201028011517608.png)
 
 
 
-git diff-tree --no-commit-id --name-only -r <commit-ish>
+现在我们假设ft01需要登录prd环境，首先确定目前存在有哪些commit属于ft01，你可以输入这行
+
+`  git log --pretty=oneline --grep "ft01"`
+
+![image-20201028012802103](F:\git研发\multienv-multiver-gittool\theory\picture\image-20201028012802103.png)
+
+> 参考资料：https://git-scm.com/book/zh/v2/Git-%E5%9F%BA%E7%A1%80-%E6%9F%A5%E7%9C%8B%E6%8F%90%E4%BA%A4%E5%8E%86%E5%8F%B2
+
+现在我们有了所有的ft01的commit信息（只有一条）
+
+接下来就是判断每个commit中提交的全部文件了。
+
+`git diff-tree --no-commit-id --name-only -r <commit-hash>`
+
+![image-20201028013347025](C:\Users\85341\AppData\Roaming\Typora\typora-user-images\image-20201028013347025.png)
+
+在下一步，就是判断commit是否产生了关联，最新版本的文件是不是将其他版本的特性带了上去
+
+`git log --pretty=oneline 文件名`
+
+![image-20201028013702580](C:\Users\85341\AppData\Roaming\Typora\typora-user-images\image-20201028013702580.png)
+
+发现没有关联（commit 之前没有出现不用上新环境的文件）之后就使用cherry-pick将所有的文件移动到下一个环境中，也就搞定了文件的读取了。
 
 ```
-git log --pretty=oneline 文件名
+git checkout prd
+git cherry-pick <commit-hash>
 ```
+
+下面演示将ft02进入prd环境
+
+```
+git log --pretty=oneline --grep "ft01"
+
+git diff-tree --no-commit-id --name-only -r 31f9e58adcd9a1b48af2f2d31d2b4a63e654918d
+git diff-tree --no-commit-id --name-only -r 70785cf9cc67fe268fe64f6f5783f6716efd1b7f
+
+git log --pretty=oneline 江雪.txt
+git log --pretty=oneline 鹳雀楼.txt
+
+git cherry-pick 70785cf9cc67fe268fe64f6f5783f6716efd1b7f
+git cherry-pick 31f9e58adcd9a1b48af2f2d31d2b4a63e654918d
+```
+
+
+
+![image-20201028015149248](C:\Users\85341\AppData\Roaming\Typora\typora-user-images\image-20201028015149248.png)
+
+![image-20201028015019819](F:\git研发\multienv-multiver-gittool\theory\picture\image-20201028015019819.png)
 
 
 
 ## 发生冲突的情况
+
+
 
 
 
